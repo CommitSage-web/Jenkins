@@ -48,16 +48,16 @@ pipeline {
     post {
         success {
             echo '✅ Pipeline completed successfully!'
-            mail to: '2024tm93199@wilp.bits-pilani.ac.in',
-                 subject: '✅ Jenkins Build Success',
-                 body: 'Good job! The Jenkins pipeline completed successfully.'
+            // mail to: '2024tm93199@wilp.bits-pilani.ac.in',
+            //      subject: '✅ Jenkins Build Success',
+            //      body: 'Good job! The Jenkins pipeline completed successfully.'
         }
 
         failure {
             echo '❌ Pipeline failed!'
-            mail to: '2024tm93199@wilp.bits-pilani.ac.in',
-                 subject: '❌ Jenkins Build Failed',
-                 body: 'Please check Jenkins logs for more information.'
+            // mail to: '2024tm93199@wilp.bits-pilani.ac.in',
+            //      subject: '❌ Jenkins Build Failed',
+            //      body: 'Please check Jenkins logs for more information.'
         }
     }
 }
