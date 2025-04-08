@@ -45,4 +45,10 @@ pipeline {
             }
         }
     }
+    post {
+        failure {
+            echo 'Pipeline failed!'
+            mail to: '2024tm93199@wilp.bits-pilani.ac.in', subject: 'Build Failed', body: 'Check Jenkins for failure logs.'
+        }
+    }
 }
