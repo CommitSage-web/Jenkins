@@ -2,40 +2,40 @@ pipeline {
     agent any
 
     stages {
-        // stage('Build') {
-        //     steps {
-        //         script {
-        //             try {
-        //                 echo 'Building application...'
-        //             } catch (Exception e) {
-        //                 error "Build failed!"
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Test') {
-        //     steps {
-        //         script {
-        //             try {
-        //                 echo 'Running tests...'
-        //             } catch (Exception e) {
-        //                 error "Tests failed!"
-        //             }
-        //         }
-        //     }
-        // }
         stage('Build') {
             steps {
-                echo "Building PR: ${env.CHANGE_ID} by ${env.CHANGE_AUTHOR}"
-                // your build logic
+                script {
+                    try {
+                        echo 'Building application...'
+                    } catch (Exception e) {
+                        error "Build failed!"
+                    }
+                }
             }
         }
+
         stage('Test') {
             steps {
-                echo "Running tests for PR: ${env.CHANGE_ID}"
+                script {
+                    try {
+                        echo 'Running tests...'
+                    } catch (Exception e) {
+                        error "Tests failed!"
+                    }
+                }
             }
         }
+        // stage('Build') {
+        //     steps {
+        //         echo "Building PR: ${env.CHANGE_ID} by ${env.CHANGE_AUTHOR}"
+        //         // your build logic
+        //     }
+        // }
+        // stage('Test') {
+        //     steps {
+        //         echo "Running tests for PR: ${env.CHANGE_ID}"
+        //     }
+        // }
 
         stage('Deploy') {
             steps {
