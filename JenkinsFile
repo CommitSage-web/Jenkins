@@ -33,7 +33,7 @@ pipeline {
         stage('Package Build') {
             steps {
                 echo '📦 Zipping project files...'
-                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
+                // bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
             }
         }
 
