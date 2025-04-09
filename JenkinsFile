@@ -37,23 +37,23 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                script {
-                    def targetUser = 'user'
-                    def targetHost = params.DEPLOY_ENV == 'staging' ? '192.168.29.221' : '192.168.29.221'
-                    def remotePath = '/var/www/app'
+        // stage('Deploy') {
+        //     steps {
+        //         script {
+        //             def targetUser = 'dheeraj\dheer'
+        //             def targetHost = params.DEPLOY_ENV == 'staging' ? '192.168.29.221' : '192.168.29.221'
+        //             def remotePath = '/var/www/app'
 
-                    echo "🚀 Deploying to ${params.DEPLOY_ENV.toUpperCase()}..."
+        //             echo "🚀 Deploying to ${params.DEPLOY_ENV.toUpperCase()}..."
 
-                    // Send ZIP
-                    bat "scp build.zip ${targetUser}@${targetHost}:${remotePath}"
+        //             // Send ZIP
+        //             bat "scp build.zip ${targetUser}@${targetHost}:${remotePath}"
 
-                    // Remote unzip and restart
-                    bat "ssh ${targetUser}@${targetHost} \"cd ${remotePath} && powershell Expand-Archive -Force build.zip && ./restart-service.sh\""
-                }
-            }
-        }
+        //             // Remote unzip and restart
+        //             bat "ssh ${targetUser}@${targetHost} \"cd ${remotePath} && powershell Expand-Archive -Force build.zip && ./restart-service.sh\""
+        //         }
+        //     }
+        // }
         
         // stage('Build') {
         //     steps {
@@ -67,30 +67,30 @@ pipeline {
         //     }
         // }
 
-        // stage('Deploy') {
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+            }
+        }
+
+        // stage('Deploy to Staging') {
         //     steps {
-        //         echo 'Deploying application...'
+        //         // Example shell commands
+        //         sh 'scp build.zip user@staging-server:/var/www/app'
+        //         sh 'ssh user@staging-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
         //     }
         // }
 
-        stage('Deploy to Staging') {
-            steps {
-                // Example shell commands
-                sh 'scp build.zip user@staging-server:/var/www/app'
-                sh 'ssh user@staging-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
-            }
-        }
-
-        stage('Deploy to Production') {
-            when {
-                branch 'main' // or use input to approve
-            }
-            steps {
-                input message: "Deploy to production?"
-                sh 'scp build.zip user@production-server:/var/www/app'
-                sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
-            }
-        }
+        // stage('Deploy to Production') {
+        //     when {
+        //         branch 'main' // or use input to approve
+        //     }
+        //     steps {
+        //         input message: "Deploy to production?"
+        //         sh 'scp build.zip user@production-server:/var/www/app'
+        //         sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
+        //     }
+        // }
     }
 
     post {
