@@ -40,7 +40,6 @@ pipeline {
                 }
             }
         }
-
         // stage('Build') {
         //     steps {
         //         script {
@@ -126,8 +125,6 @@ pipeline {
         //         sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
         //     }
         // }
-    }
-
     post {
         success {
             echo '✅ Pipeline completed successfully!'
