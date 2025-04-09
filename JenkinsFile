@@ -8,34 +8,69 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                script {
-                    try {
-                        echo 'Building application...'
-                    } catch (Exception e) {
-                        error "Build failed!"
-                    }
+                    sh 'echo "Building the project..."'
+                    // Add build commands here
+                }
+            }
+
+            stage('Test') {
+                steps {
+                    sh 'echo "Running tests..."'
+                    // Add test scripts here
+                }
+            }
+
+            stage('Deploy to Staging') {
+                steps {
+                    echo 'Deploying to Staging...'
+                    sh 'docker-compose -f docker-compose.staging.yml up -d --build'
+                }
+            }
+
+            stage('Approval for Production') {
+                steps {
+                    input message: 'Deploy to Production?', ok: 'Yes, Deploy'
+                }
+            }
+
+            stage('Deploy to Production') {
+                steps {
+                    echo 'Deploying to Production...'
+                    sh 'docker-compose -f docker-compose.production.yml up -d --build'
                 }
             }
         }
 
-        stage('Test') {
-            steps {
-                script {
-                    try {
-                        echo 'Running tests...'
-                    } catch (Exception e) {
-                        error "Tests failed!"
-                    }
-                }
-            }
-        }
+        // stage('Build') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 echo 'Building application...'
+        //             } catch (Exception e) {
+        //                 error "Build failed!"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Package Build') {
-            steps {
-                echo '📦 Zipping project files...'
-                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 echo 'Running tests...'
+        //             } catch (Exception e) {
+        //                 error "Tests failed!"
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('Package Build') {
+        //     steps {
+        //         echo '📦 Zipping project files...'
+        //         bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
+        //     }
+        // }
 
         // stage('Deploy') {
         //     steps {
@@ -67,11 +102,11 @@ pipeline {
         //     }
         // }
 
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application...'
-            }
-        }
+        // stage('Deploy') {
+        //     steps {
+        //         echo 'Deploying application...'
+        //     }
+        // }
 
         // stage('Deploy to Staging') {
         //     steps {
@@ -108,4 +143,4 @@ pipeline {
             //      body: 'Please check Jenkins logs for more information.'
         }
     }
-}
+}scp build.zip dheer@192.168.29.221:/var/www/app

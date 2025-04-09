@@ -1,8 +1,13 @@
+# docker-compose.staging.yml
 version: '3.8'
 
 services:
-  web:
-    build: .
-    env_file: .env.staging
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: myapp-staging
     ports:
-      - "5001:5000"
+      - "8081:3000"
+    environment:
+      - NODE_ENV=staging

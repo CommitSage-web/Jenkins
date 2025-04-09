@@ -1,8 +1,13 @@
+# docker-compose.production.yml
 version: '3.8'
 
 services:
-  web:
-    build: .
-    env_file: .env.production
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: myapp-production
     ports:
-      - "5002:5000"
+      - "8082:3000"
+    environment:
+      - NODE_ENV=production
