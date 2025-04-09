@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['staging', 'production'], description: 'Where do you want to deploy?')
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -25,6 +29,32 @@ pipeline {
                 }
             }
         }
+
+        stage('Package Build') {
+            steps {
+                echo '📦 Zipping project files...'
+                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    def targetUser = 'user'
+                    def targetHost = params.DEPLOY_ENV == 'staging' ? 'staging-server' : 'production-server'
+                    def remotePath = '/var/www/app'
+
+                    echo "🚀 Deploying to ${params.DEPLOY_ENV.toUpperCase()}..."
+
+                    // Send ZIP
+                    bat "scp build.zip ${targetUser}@${targetHost}:${remotePath}"
+
+                    // Remote unzip and restart
+                    bat "ssh ${targetUser}@${targetHost} \"cd ${remotePath} && powershell Expand-Archive -Force build.zip && ./restart-service.sh\""
+                }
+            }
+        }
+        
         // stage('Build') {
         //     steps {
         //         echo "Building PR: ${env.CHANGE_ID} by ${env.CHANGE_AUTHOR}"
@@ -62,9 +92,7 @@ pipeline {
             }
         }
     }
-    parameters {
-        choice(name: 'ENV', choices: ['staging', 'production'], description: 'Select environment to deploy to')
-    }
+
     post {
         success {
             echo '✅ Pipeline completed successfully!'
