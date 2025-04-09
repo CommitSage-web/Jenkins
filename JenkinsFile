@@ -8,68 +8,54 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                    sh 'echo "Building the project..."'
-                    // Add build commands here
-                }
-            }
-
-            stage('Test') {
-                steps {
-                    sh 'echo "Running tests..."'
-                    // Add test scripts here
-                }
-            }
-
-            stage('Deploy to Staging') {
-                steps {
-                    echo 'Deploying to Staging...'
-                    sh 'docker-compose -f docker-compose.staging.yml up -d --build'
-                }
-            }
-
-            stage('Approval for Production') {
-                steps {
-                    input message: 'Deploy to Production?', ok: 'Yes, Deploy'
-                }
-            }
-
-            stage('Deploy to Production') {
-                steps {
-                    echo 'Deploying to Production...'
-                    sh 'docker-compose -f docker-compose.production.yml up -d --build'
+                script {
+                    try {
+                        echo 'Building application...'
+                    } catch (Exception e) {
+                        error "Build failed!"
+                    }
                 }
             }
         }
-        // stage('Build') {
-        //     steps {
-        //         script {
-        //             try {
-        //                 echo 'Building application...'
-        //             } catch (Exception e) {
-        //                 error "Build failed!"
-        //             }
-        //         }
-        //     }
-        // }
 
-        // stage('Test') {
-        //     steps {
-        //         script {
-        //             try {
-        //                 echo 'Running tests...'
-        //             } catch (Exception e) {
-        //                 error "Tests failed!"
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                script {
+                    try {
+                        echo 'Running tests...'
+                    } catch (Exception e) {
+                        error "Tests failed!"
+                    }
+                }
+            }
+        }
 
-        // stage('Package Build') {
-        //     steps {
-        //         echo '📦 Zipping project files...'
-        //         bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
-        //     }
-        // }
+        stage('Package Build') {
+            steps {
+                echo '📦 Zipping project files...'
+                bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying to Staging...'
+                sh 'docker-compose -f docker-compose.staging.yml up -d --build'
+            }
+        }
+
+        stage('Approval for Production') {
+            steps {
+                input message: 'Deploy to Production?', ok: 'Yes, Deploy'
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying to Production...'
+                sh 'docker-compose -f docker-compose.prod.yml up -d --build'
+            }
+        }
 
         // stage('Deploy') {
         //     steps {
@@ -125,6 +111,8 @@ pipeline {
         //         sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
         //     }
         // }
+    }
+
     post {
         success {
             echo '✅ Pipeline completed successfully!'
