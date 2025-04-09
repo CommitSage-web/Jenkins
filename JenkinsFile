@@ -143,4 +143,4 @@ pipeline {
             //      body: 'Please check Jenkins logs for more information.'
         }
     }
-}scp build.zip dheer@192.168.29.221:/var/www/app
+}
