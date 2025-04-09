@@ -45,16 +45,25 @@ pipeline {
 
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to Staging...'
+                // Example shell commands
+                sh 'scp build.zip user@staging-server:/var/www/app'
+                sh 'ssh user@staging-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
             }
         }
 
         stage('Deploy to Production') {
+            when {
+                branch 'main' // or use input to approve
+            }
             steps {
-                input 'Deploy to Production?'
-                echo 'Deploying to Production...'
+                input message: "Deploy to production?"
+                sh 'scp build.zip user@production-server:/var/www/app'
+                sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
             }
         }
+    }
+    parameters {
+        choice(name: 'ENV', choices: ['staging', 'production'], description: 'Select environment to deploy to')
     }
     post {
         success {
