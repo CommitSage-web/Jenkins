@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     def targetUser = 'user'
-                    def targetHost = params.DEPLOY_ENV == 'staging' ? 'staging-server' : 'production-server'
+                    def targetHost = params.DEPLOY_ENV == 'staging' ? '192.168.29.221:5001' : '192.168.29.221:5002'
                     def remotePath = '/var/www/app'
 
                     echo "🚀 Deploying to ${params.DEPLOY_ENV.toUpperCase()}..."
