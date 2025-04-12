@@ -1,131 +1,58 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(name: 'DEPLOY_ENV', choices: ['staging', 'production'], description: 'Where do you want to deploy?')
-    }
-
-    stages {
+    stages {        
         stage('Build') {
             steps {
-                script {
-                    try {
-                        echo 'Building application...'
-                    } catch (Exception e) {
-                        error "Build failed!"
-                    }
-                }
+                echo "Building PR: ${env.CHANGE_ID} by ${env.CHANGE_AUTHOR}"
+                // your build logic
             }
         }
-
         stage('Test') {
             steps {
-                script {
-                    try {
-                        echo 'Running tests...'
-                    } catch (Exception e) {
-                        error "Tests failed!"
-                    }
-                }
+                echo "Running tests for PR: ${env.CHANGE_ID}"
             }
         }
 
-        stage('Package Build') {
+        stage('Deploy') {
             steps {
-                echo '📦 Zipping project files...'
-                // bat 'powershell -Command "Compress-Archive -Path * -DestinationPath build.zip -Force"'
+                echo 'Deploying application...'
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to Staging...'
-                sh 'docker-compose -f docker-compose.staging.yml up --build -d'
-            }
-        }
-
-        stage('Approval for Production') {
-            steps {
-                input message: 'Deploy to Production?', ok: 'Yes, Deploy'
+                // Example shell commands
+                sh 'scp build.zip user@staging-server:/var/www/app'
+                sh 'ssh user@staging-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
             }
         }
 
         stage('Deploy to Production') {
+            when {
+                branch 'main' // or use input to approve
+            }
             steps {
-                echo 'Deploying to Production...'
-                sh 'docker-compose -f docker-compose.prod.yml up --build -d'
+                input message: "Deploy to production?"
+                sh 'scp build.zip user@production-server:/var/www/app'
+                sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
             }
         }
-
-        // stage('Deploy') {
-        //     steps {
-        //         script {
-        //             def targetUser = 'dheeraj\dheer'
-        //             def targetHost = params.DEPLOY_ENV == 'staging' ? '192.168.29.221' : '192.168.29.221'
-        //             def remotePath = '/var/www/app'
-
-        //             echo "🚀 Deploying to ${params.DEPLOY_ENV.toUpperCase()}..."
-
-        //             // Send ZIP
-        //             bat "scp build.zip ${targetUser}@${targetHost}:${remotePath}"
-
-        //             // Remote unzip and restart
-        //             bat "ssh ${targetUser}@${targetHost} \"cd ${remotePath} && powershell Expand-Archive -Force build.zip && ./restart-service.sh\""
-        //         }
-        //     }
-        // }
-        
-        // stage('Build') {
-        //     steps {
-        //         echo "Building PR: ${env.CHANGE_ID} by ${env.CHANGE_AUTHOR}"
-        //         // your build logic
-        //     }
-        // }
-        // stage('Test') {
-        //     steps {
-        //         echo "Running tests for PR: ${env.CHANGE_ID}"
-        //     }
-        // }
-
-        // stage('Deploy') {
-        //     steps {
-        //         echo 'Deploying application...'
-        //     }
-        // }
-
-        // stage('Deploy to Staging') {
-        //     steps {
-        //         // Example shell commands
-        //         sh 'scp build.zip user@staging-server:/var/www/app'
-        //         sh 'ssh user@staging-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
-        //     }
-        // }
-
-        // stage('Deploy to Production') {
-        //     when {
-        //         branch 'main' // or use input to approve
-        //     }
-        //     steps {
-        //         input message: "Deploy to production?"
-        //         sh 'scp build.zip user@production-server:/var/www/app'
-        //         sh 'ssh user@production-server "cd /var/www/app && unzip -o build.zip && restart-service.sh"'
-        //     }
-        // }
     }
 
     post {
         success {
             echo '✅ Pipeline completed successfully!'
-            // mail to: '2024tm93199@wilp.bits-pilani.ac.in',
-            //      subject: '✅ Jenkins Build Success',
-            //      body: 'Good job! The Jenkins pipeline completed successfully.'
+            mail to: '2024tm93199@wilp.bits-pilani.ac.in',
+                 subject: '✅ Jenkins Build Success',
+                 body: 'Good job! The Jenkins pipeline completed successfully.'
         }
 
         failure {
             echo '❌ Pipeline failed!'
-            // mail to: '2024tm93199@wilp.bits-pilani.ac.in',
-            //      subject: '❌ Jenkins Build Failed',
-            //      body: 'Please check Jenkins logs for more information.'
+            mail to: '2024tm93199@wilp.bits-pilani.ac.in',
+                 subject: '❌ Jenkins Build Failed',
+                 body: 'Please check Jenkins logs for more information.'
         }
     }
 }

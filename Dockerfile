@@ -2,6 +2,8 @@ FROM python:3.9-slim
 WORKDIR /app
 COPY app/ .
 RUN pip install flask
+# Expose SSH port and start SSHD
+EXPOSE 22
 CMD ["python", "app.py"]
 
 # FROM python:3.9-slim
@@ -12,3 +14,4 @@ CMD ["python", "app.py"]
 
 # WORKDIR /app
 # COPY . .
+
